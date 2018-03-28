@@ -272,7 +272,7 @@ interact(model_2, **default_sliders)
 
 * Model 3: continuous-time epidemic (with final size)
 
-We can modify model 3 to keep track of the cumulative infections ($C$)
+We can modify model 2 to keep track of the cumulative infections ($C$)
 by using the equations:
 
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
