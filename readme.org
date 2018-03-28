@@ -20,9 +20,11 @@ https://www.anaconda.com/download
 
 If you do not want to install anything in your computer, you can also
 run the code online. This method will be slower and you will have to
-copy and paste each instruction. To try it go to:
+copy and paste each instruction. To proceed this way go to:
 https://jupyter.org/try and click on "Try Jupyter with Python".
 
 * Code
 
-The code is provided as [[file:SIR_models.ipynb][one Jupyter notebook]].
+The code is provided as [[file:SIR_models.ipynb][one Jupyter notebook]]. To download the file,
+after accessing it, click on "Raw" and then save it from your browser
+(usually Control-s).
