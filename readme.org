@@ -1,8 +1,11 @@
-#+TITLE: Transmission modeling for applied epidemiology
+#+TITLE: Introduction to SIR models in Python
 
 * Introduction
 
-The course will be held on June 22, 2018 as part of
+This material is part of one-day transmission modeling for applied
+epidemiology course that will be held on June 22, 2018 as part of the
+Chinese Society for Mathematical Biology's (CSMB) *6th International
+Conference on Mathematical Biology*.
 
 has been devised based on our contributions to the Epidemic
 Intelligence Service curriculum, a two-year fellowship in applied
