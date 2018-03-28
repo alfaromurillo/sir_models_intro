@@ -84,9 +84,13 @@ plt.show()
 
 #+BEGIN_SRC python
 results_model_1 = model_1(0.05, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
+
 plt.plot(np.linspace(0, 300, 1000), results_model_1)
+
 plt.xlabel("Time (days)")
+
 plt.legend(["S", "I", "R"])
+
 plt.show()
 #+END_SRC
 
@@ -96,6 +100,7 @@ plt.show()
 resolution = 1000
 legends = ["S (susceptible)", "I (infectious)", "R (recovered)"]
 xlabel = "Time (days)"
+
 
 def plot_model(ts, xs):
     plt.plot(ts, xs)
@@ -171,12 +176,14 @@ interact(model_1, **default_sliders)
 #+BEGIN_SRC python
 import ipywidgets as widgets
 
+
 default_sliders['one_over_gamma'] = widgets.FloatSlider(
     value=5.0,
     min=2.0,
     max=10.0,
     step=0.1,
     description='1/gamma')
+
 
 interact(model_1, **default_sliders)
 #+END_SRC
@@ -185,6 +192,15 @@ For more on widgets check
 http://ipywidgets.readthedocs.io/en/latest/examples/Widget%20List.html
 
 * Model 2: continuous-time epidemic
+
+$$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
+= \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} S(t)
+\\ \frac{\mathrm{d}}{\mathrm{d}t} I(t)
+\\ \frac{\mathrm{d}}{\mathrm{d}t} R(t) \end{bmatrix}
+= \begin{bmatrix} - \frac{\beta a S(t) I(t)}{N} + w R(t)
+\\ \frac{\beta a S(t) I(t)}{N} - \gamma I(t) \\ \gamma
+I(t)  + w R(t)
+\end{bmatrix}$$
 
 #+BEGIN_SRC python
 def f_model_2(x, t, beta, a, p, w, gamma, N):
@@ -198,6 +214,7 @@ def f_model_2(x, t, beta, a, p, w, gamma, N):
     dR_dt = gamma*I - w*R
 
     return [dS_dt, dI_dt, dR_dt]
+
 
 def model_2(beta=0.05,
             a=10,
@@ -325,7 +342,9 @@ interact(model_3, **default_sliders)
 def interact_with_model(model):
     interact(model, **default_sliders)
 
+
 models = [model_1, model_2, model_3]
+
 
 interact(interact_with_model, model=models)
 #+END_SRC
