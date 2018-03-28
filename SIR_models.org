@@ -1,0 +1,335 @@
+#+TITLE: Introduction to SIR models in Python
+
+* Importing libraries
+
+#+BEGIN_SRC python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import odeint
+from ipywidgets import interact
+#+END_SRC
+
+* Solving and ODE model
+
+A general system of differential equations is of the form:
+
+$$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
+= \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} x_1(t)\\ \vdots
+\\ \frac{\mathrm{d}}{\mathrm{d}t} x_n(t) \end{bmatrix} = f(\mathbf{x}(t), t,
+\mathbf{z}),$$
+
+where $\mathbf{x}(t)$ and $\mathbf{z}$ are vectors and $f$ is a function that maps to
+vectors.
+
+For us, the $\mathbf{x}$ represents all the classes in our model,
+$\mathbf{z}$ all the parameters in our model and $t$ represents time.
+
+To solve an ODE in Python we have define the function $f$.
+
+* Model 1: continuous-time endemic
+
+$$\mathbf{x} = \begin{bmatrix} S \\ I \\ R \end{bmatrix}$$
+
+$$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
+= \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} S(t)
+\\ \frac{\mathrm{d}}{\mathrm{d}t} I(t)
+\\ \frac{\mathrm{d}}{\mathrm{d}t} R(t) \end{bmatrix}
+= \begin{bmatrix} -\mu N(t) - \frac{\beta a S(t) I(t)}{N} + w R(t) -\mu S(t)
+\\ \frac{\beta a S(t) I(t)}{N} - \gamma I(t) - \mu I(t) \\ \gamma
+I(t) - \mu R(t) + w R(t)
+\end{bmatrix}$$
+
+** Defining f
+
+#+BEGIN_SRC python
+def f_model_1(x, t, beta, a, mu, w, gamma, N):
+    S = x[0]
+    I = x[1]
+    R = x[2]
+
+    dS_dt = mu*N - beta*a*S*I/N + w*R - mu*S
+    dI_dt = beta*a*S*I/N - gamma*I - mu*I
+    dR_dt = gamma*I - mu*R + w*R
+
+    return [dS_dt, dI_dt, dR_dt]
+#+END_SRC
+
+** Solving the model
+
+#+BEGIN_SRC python
+def model_1(beta, a, mu, w, one_over_gamma, initial_I, initial_R, N, max_time):
+
+    ts = np.linspace(0, max_time, 1000)
+    xs = odeint(f_model_1,
+                [N-initial_I-initial_R, initial_I, initial_R],
+                ts,
+                args=(beta, a, mu, w, 1/one_over_gamma, N))
+
+    return xs
+#+END_SRC
+
+** Running our first model
+
+#+BEGIN_SRC python
+model_1(0.05, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
+#+END_SRC
+
+** Plotting the results
+
+#+BEGIN_SRC python
+results_model_1 = model_1(0.05, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
+plt.plot(results_model_1)
+plt.show()
+#+END_SRC
+
+#+BEGIN_SRC python
+results_model_1 = model_1(0.05, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
+plt.plot(np.linspace(0, 300, 1000), results_model_1)
+plt.xlabel("Time (days)")
+plt.legend(["S", "I", "R"])
+plt.show()
+#+END_SRC
+
+** Improve code and set default values
+
+#+BEGIN_SRC python
+resolution = 1000
+legends = ["S (susceptible)", "I (infectious)", "R (recovered)"]
+xlabel = "Time (days)"
+
+def plot_model(ts, xs):
+    plt.plot(ts, xs)
+    plt.legend(legends)
+    plt.xlabel(xlabel)
+    plt.show()
+
+
+def model_1(beta=0.05,
+            a=10.0,
+            mu=0.001,
+            w=0.01,
+            one_over_gamma=5.0,
+            initial_I=1,
+            initial_R=0,
+            N=100,
+            max_time=300.0):
+
+    ts = np.linspace(0, max_time, resolution)
+    xs = odeint(f_model_1,
+                [N-initial_I-initial_R, initial_I, initial_R],
+                ts,
+    args=(beta, a, mu, w, 1/one_over_gamma, N))
+
+    plot_model(ts, xs)
+
+    R0 = beta*a/(1/one_over_gamma+mu)
+    print("R0 = {:.2f}".format(R0))
+
+    return xs
+#+END_SRC
+
+#+BEGIN_SRC python
+model_1()
+#+END_SRC
+
+#+BEGIN_SRC python
+model_1(mu=0.002, beta=0.06)
+#+END_SRC
+
+* Interacting with the parameters
+
+#+BEGIN_SRC python
+interact(model_1,
+         beta=(0.01, 0.1, 0.01),
+         a=(5, 15, 0.1),
+         mu=(0, 0.01, 0.0001),
+         w=(0.001, 0.1, 0.001),
+         one_over_gamma=(2, 10, 0.1),
+         N=(0, 1000, 10.0),
+         initial_I=(0, 50),
+         initial_R=(0, 50),
+         max_time=(1, 500, 10))
+#+END_SRC
+
+#+BEGIN_SRC python
+default_sliders = {'beta':(0.01, 0.1, 0.01),
+                   'a':(5, 15, 0.1),
+                   'mu':(0.0, 0.01, 0.0001),
+                   'w':(0.001, 0.1, 0.001),
+                   'one_over_gamma':(2.0, 10.0, 0.1),
+                   'N':(1, 1000, 10),
+                   'initial_I':(0, 50),
+                   'initial_R':(0, 50),
+                   'max_time':(1, 500, 10)}
+
+
+interact(model_1, **default_sliders)
+#+END_SRC
+
+** Improving sliders
+
+#+BEGIN_SRC python
+import ipywidgets as widgets
+
+default_sliders['one_over_gamma'] = widgets.FloatSlider(
+    value=5.0,
+    min=2.0,
+    max=10.0,
+    step=0.1,
+    description='1/gamma')
+
+interact(model_1, **default_sliders)
+#+END_SRC
+
+For more on widgets check
+http://ipywidgets.readthedocs.io/en/latest/examples/Widget%20List.html
+
+* Model 2: continuous-time epidemic
+
+#+BEGIN_SRC python
+def f_model_2(x, t, beta, a, p, w, gamma, N):
+    S = x[0]
+    I = x[1]
+    R = x[2]
+
+    new_infections = beta*a*S*I/N
+    dS_dt = - new_infections + w*R
+    dI_dt = new_infections - gamma*I
+    dR_dt = gamma*I - w*R
+
+    return [dS_dt, dI_dt, dR_dt]
+
+def model_2(beta=0.05,
+            a=10,
+            w=0.01,
+            one_over_gamma=5.0,
+            p=0.2,
+            initial_I=1.0,
+            N=100.0,
+            max_time=300.0):
+
+    ts = np.linspace(0, max_time, resolution)
+    xs = odeint(f_model_2,
+                [N-initial_I-p*N, initial_I, p*N],
+                ts,
+                args=(beta, a, p, w, 1/one_over_gamma, N))
+
+    plot_model(ts, xs)
+
+    R0 = beta*a*one_over_gamma
+    Rv = (1-p)*R0
+    print("R0 = {:.2f}".format(R0))
+    print("Rv = {:.2f}".format(Rv))
+
+    return xs
+#+END_SRC
+
+#+BEGIN_SRC python
+  model_2()
+#+END_SRC
+
+#+BEGIN_SRC python
+default_sliders['p'] = (0, 1, 0.1)
+
+interact(model_2, **default_sliders)
+#+END_SRC
+
+* Model 3: continuous-time epidemic (with final size)
+
+#+BEGIN_SRC python
+def f_model_3(x, t, beta, a, p, w, gamma, N):
+    S = x[0]
+    I = x[1]
+    R = x[2]
+
+    new_infections = beta*a*S*I/N
+    dS_dt = -new_infections + w*R
+    dI_dt = new_infections - gamma*I
+    dR_dt = gamma*I - w*R
+    dC_dt = new_infections
+
+    return [dS_dt, dI_dt, dR_dt, dC_dt]
+
+
+def model_3(beta=0.05,
+            a=10,
+            w=0.01,
+            one_over_gamma=5.0,
+            p=0.2,
+            initial_I=1,
+            N=100,
+            max_time=300):
+
+    ts = np.linspace(0, max_time, resolution)
+    xs = odeint(f_model_3,
+                [N-initial_I-p*N, initial_I, p*N, 0],
+                ts,
+                args=(beta, a, p, w, 1/one_over_gamma, N))
+
+    plot_model(ts, xs)
+
+    R0 = beta*a*one_over_gamma
+    Rv = (1-p)*R0
+    print("R0 = {:.2f}".format(R0))
+    print("Rv = {:.2f}".format(Rv))
+
+    return xs
+#+END_SRC
+
+#+BEGIN_SRC python
+model_3()
+#+END_SRC
+
+** Fixing the labels
+
+#+BEGIN_SRC python
+legends = ['S (susceptible)',
+           'I (infectious)',
+           'R (recovered)',
+           'C (cumulative)']
+model_3()
+#+END_SRC
+
+** Fixing the numerical issues
+
+#+BEGIN_SRC python
+def f_model_3(x, t, beta, a, p, w, gamma, N):
+    S = x[0]
+    I = x[1]
+    R = x[2]
+    c = x[3]
+
+    new_infections = beta*a*S*I/N
+    if I < 1:
+        I = 0
+        new_infections = 0
+
+    dS_dt = -new_infections + w*R
+    dI_dt = new_infections - gamma*I
+    dR_dt = gamma*I - w*R
+    dC_dt = new_infections
+
+    return [dS_dt, dI_dt, dR_dt, dC_dt]
+
+
+model_3()
+#+END_SRC
+
+#+BEGIN_SRC python
+interact(model_3, **default_sliders)
+#+END_SRC
+
+* Extra interaction
+
+#+BEGIN_SRC python
+def interact_with_model(model):
+    interact(model, **default_sliders)
+
+models = [model_1, model_2, model_3]
+
+interact(interact_with_model, model=models)
+#+END_SRC
+
+# Local Variables:
+# eval: (org-src-preserve-indentation t)
+# End:
