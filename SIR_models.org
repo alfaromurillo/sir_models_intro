@@ -19,12 +19,15 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 \mathbf{z}),$$
 
 where $\mathbf{x}(t)$ and $\mathbf{z}$ are vectors and $f$ is a function that maps to
-vectors.
+a vector. We also have to provide an initial condition:
+
+$$\mathbf{x}(0) = \mathbf{x_0}.$$
 
 For us, the $\mathbf{x}$ represents all the classes in our model,
 $\mathbf{z}$ all the parameters in our model and $t$ represents time.
 
-To solve an ODE in Python we have define the function $f$.
+To solve an ODE in Python we have define the function $f$ and provide
+the initial condition $\mathbf{x_0}$.
 
 * Model 1: continuous-time endemic
 
@@ -60,8 +63,9 @@ def f_model_1(x, t, beta, a, mu, w, gamma, N):
 def model_1(beta, a, mu, w, one_over_gamma, initial_I, initial_R, N, max_time):
 
     ts = np.linspace(0, max_time, 1000)
+    x0 = [N-initial_I-initial_R, initial_I, initial_R]
     xs = odeint(f_model_1,
-                [N-initial_I-initial_R, initial_I, initial_R],
+                x0,
                 ts,
                 args=(beta, a, mu, w, 1/one_over_gamma, N))
 
@@ -120,8 +124,9 @@ def model_1(beta=0.05,
             max_time=300.0):
 
     ts = np.linspace(0, max_time, resolution)
+    x0 = [N-initial_I-initial_R, initial_I, initial_R]
     xs = odeint(f_model_1,
-                [N-initial_I-initial_R, initial_I, initial_R],
+                x0,
                 ts,
     args=(beta, a, mu, w, 1/one_over_gamma, N))
 
@@ -202,6 +207,10 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 I(t)  + w R(t)
 \end{bmatrix}$$
 
+$$\mathbf{x_0}
+= \begin{bmatrix} N - I_0 - p N
+\\ I_0 \\ pN \end{bmatrix}$$
+
 #+BEGIN_SRC python
 def f_model_2(x, t, beta, a, p, w, gamma, N):
     S = x[0]
@@ -226,8 +235,9 @@ def model_2(beta=0.05,
             max_time=300.0):
 
     ts = np.linspace(0, max_time, resolution)
+    x0 = [N-initial_I-p*N, initial_I, p*N]
     xs = odeint(f_model_2,
-                [N-initial_I-p*N, initial_I, p*N],
+                x0,
                 ts,
                 args=(beta, a, p, w, 1/one_over_gamma, N))
 
@@ -278,8 +288,9 @@ def model_3(beta=0.05,
             max_time=300):
 
     ts = np.linspace(0, max_time, resolution)
+    x0 = [N-initial_I-p*N, initial_I, p*N, 0]
     xs = odeint(f_model_3,
-                [N-initial_I-p*N, initial_I, p*N, 0],
+                x0,
                 ts,
                 args=(beta, a, p, w, 1/one_over_gamma, N))
 
