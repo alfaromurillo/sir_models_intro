@@ -31,6 +31,8 @@ the initial condition $\mathbf{x_0}$.
 
 * Model 1: continuous-time endemic
 
+Model 1 has the equations
+
 $$\mathbf{x} = \begin{bmatrix} S \\ I \\ R \end{bmatrix}$$
 
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
@@ -41,6 +43,9 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 \\ \frac{\beta a S(t) I(t)}{N} - \gamma I(t) - \mu I(t) \\ \gamma
 I(t) - \mu R(t) + w R(t)
 \end{bmatrix}$$
+
+plus and initial condition determined by $I(0)$ and $R(0)$ (the
+initial population has to be $N$).
 
 ** Defining f
 
@@ -198,6 +203,8 @@ http://ipywidgets.readthedocs.io/en/latest/examples/Widget%20List.html
 
 * Model 2: continuous-time epidemic
 
+Model 2 has the equations:
+
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} S(t)
 \\ \frac{\mathrm{d}}{\mathrm{d}t} I(t)
@@ -206,6 +213,8 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 \\ \frac{\beta a S(t) I(t)}{N} - \gamma I(t) \\ \gamma
 I(t)  + w R(t)
 \end{bmatrix}$$
+
+and the initial condition:
 
 $$\mathbf{x_0}
 = \begin{bmatrix} N - I_0 - p N
@@ -263,6 +272,9 @@ interact(model_2, **default_sliders)
 
 * Model 3: continuous-time epidemic (with final size)
 
+We can modify model 3 to keep track of the cumulative infections ($C$)
+by using the equations:
+
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} S(t)
 \\ \frac{\mathrm{d}}{\mathrm{d}t} I(t)
@@ -273,6 +285,8 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 I(t)  + w R(t) \\
 \frac{\beta a S(t) I(t)}{N}
 \end{bmatrix}$$
+
+and the initial condition:
 
 $$\mathbf{x_0}
 = \begin{bmatrix} N - I_0 - p N
