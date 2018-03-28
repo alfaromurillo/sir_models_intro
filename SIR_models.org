@@ -26,7 +26,7 @@ $\mathbf{z}$ all the parameters in our model and $t$ represents time.
 
 To solve an ODE in Python we have define the function $f$.
 
-* Model 1
+* Model 1: continuous-time endemic
 
 $$\mathbf{x} = \begin{bmatrix} S \\ I \\ R \end{bmatrix}$$
 
@@ -184,7 +184,7 @@ interact(model_1, **default_sliders)
 For more on widgets check
 http://ipywidgets.readthedocs.io/en/latest/examples/Widget%20List.html
 
-* Model 2
+* Model 2: continuous-time epidemic
 
 #+BEGIN_SRC python
 def f_model_2(x, t, beta, a, p, w, gamma, N):
@@ -234,7 +234,7 @@ default_sliders['p'] = (0, 1, 0.1)
 interact(model_2, **default_sliders)
 #+END_SRC
 
-* Model 3
+* Model 3: continuous-time epidemic (with final size)
 
 #+BEGIN_SRC python
 def f_model_3(x, t, beta, a, p, w, gamma, N):
