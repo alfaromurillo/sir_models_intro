@@ -1,0 +1,42 @@
+#+TITLE: Transmission modeling for applied epidemiology
+
+* Introduction
+
+The course will be held on June 22, 2018 as part of
+
+has been devised based on our contributions to the Epidemic
+Intelligence Service curriculum, a two-year fellowship in applied
+epidemiology at the CDC.
+
+This repository provides the code for the hands-on practical exercises
+in python.
+
+* Requirements
+
+The code is provided as a Jupyter notebook.
+
+To use the code provided you will to have Jupyter and a P ython
+installation with the SciPy, NumPy, Matplotlib and ipywidgets
+libraries, as well as all their dependencies.
+
+The easiest way to obtain every requirement is to install the Anaconda
+Distribution, which includes everything needed (plus a lot more):
+https://www.anaconda.com/download
+
+If you do not want to install anything in your computer, you can also
+run the code online. This method will be slower and you will have to
+copy and paste each instruction. To try it go to:
+https://jupyter.org/try and click on "Try Jupyter with Python".
+
+* Code
+
+** Importing libraries
+
+#+BEGIN_SRC python
+  import numpy as np
+  import matplotlib.pyplot as plt
+  from scipy.integrate import odeint
+  from ipywidgets import interact
+#+END_SRC
+
+** Solving and plotting and SIR model
