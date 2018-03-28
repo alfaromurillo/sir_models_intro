@@ -8,7 +8,7 @@ China.
 This repository provides the code for the hands-on practical exercises
 in the Python programming language.
 
-* Requirements
+* Instructions
 
 To use the code provided you will require the Jupyter notebook and a
 Python installation with the SciPy, NumPy, Matplotlib and ipywidgets
@@ -16,12 +16,16 @@ libraries, as well as all their dependencies.
 
 The easiest way to obtain every requirement is to install the Anaconda
 Distribution, which includes everything needed (plus a lot more):
-https://www.anaconda.com/download
+https://www.anaconda.com/download. Follow the instructions there for
+your appropriate operative system.
 
 If you do not want to install anything in your computer, you can also
 run the code online. This method will be slower and you will have to
-copy and paste each instruction. To proceed this way go to:
-https://jupyter.org/try and click on "Try Jupyter with Python".
+copy and paste each block of code. To proceed this way go to:
+https://jupyter.org/try and click on "Try Jupyter with Python". After
+the page loads, click on "Insert", "Insert Cell Below" and start
+copying and pasting the code from [[file:SIR_models.ipynb][the Jupyter notebook]]. To run each
+block press Shift and the Enter key.
 
 * Code
 
