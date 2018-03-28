@@ -263,6 +263,21 @@ interact(model_2, **default_sliders)
 
 * Model 3: continuous-time epidemic (with final size)
 
+$$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
+= \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} S(t)
+\\ \frac{\mathrm{d}}{\mathrm{d}t} I(t)
+\\ \frac{\mathrm{d}}{\mathrm{d}t} R(t)
+\\ \frac{\mathrm{d}}{\mathrm{d}t} C(t)\end{bmatrix}
+= \begin{bmatrix} - \frac{\beta a S(t) I(t)}{N} + w R(t)
+\\ \frac{\beta a S(t) I(t)}{N} - \gamma I(t) \\ \gamma
+I(t)  + w R(t) \\
+\frac{\beta a S(t) I(t)}{N}
+\end{bmatrix}$$
+
+$$\mathbf{x_0}
+= \begin{bmatrix} N - I_0 - p N
+\\ I_0 \\ pN \\ 0\end{bmatrix}$$
+
 #+BEGIN_SRC python
 def f_model_3(x, t, beta, a, p, w, gamma, N):
     S = x[0]
