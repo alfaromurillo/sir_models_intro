@@ -239,12 +239,12 @@ def f_model_2(x, t, beta, a, p, w, gamma, N):
 
 def model_2(beta=0.05,
             a=10,
-            w=0.01,
+            w=0.00,
             one_over_gamma=5.0,
             p=0.2,
             initial_I=1.0,
             N=100.0,
-            max_time=300.0):
+            max_time=100.0):
 
     ts = np.linspace(0, max_time, resolution)
     x0 = [N-initial_I-p*N, initial_I, p*N]
