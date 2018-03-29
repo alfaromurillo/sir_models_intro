@@ -157,11 +157,11 @@ model_1(mu=0.002, beta=0.06)
 
 #+BEGIN_SRC python
 interact(model_1,
-         beta=(0.01, 0.1, 0.01),
+         beta=(0.01, 0.1, 0.001),
          a=(5, 15, 0.1),
          mu=(0, 0.01, 0.0001),
          w=(0.001, 0.1, 0.001),
-         one_over_gamma=(2, 10, 0.1),
+         one_over_gamma=(2, 30, 0.1),
          N=(0, 1000, 10.0),
          initial_I=(0, 50),
          initial_R=(0, 50),
@@ -169,12 +169,12 @@ interact(model_1,
 #+END_SRC
 
 #+BEGIN_SRC python
-default_sliders = {'beta':(0.01, 0.1, 0.01),
+default_sliders = {'beta':(0.01, 0.1, 0.001),
                    'a':(5, 15, 0.1),
                    'mu':(0.0, 0.01, 0.0001),
                    'w':(0.001, 0.1, 0.001),
-                   'one_over_gamma':(2.0, 10.0, 0.1),
-                   'N':(1, 1000, 10),
+                   'one_over_gamma':(2.0, 30.0, 0.1),
+                   'N':(1, 20000, 50),
                    'initial_I':(0, 50),
                    'initial_R':(0, 50),
                    'max_time':(1, 500, 10)}
@@ -364,6 +364,93 @@ def interact_with_model(model):
 models = [model_1, model_2, model_3]
 
 
+interact(interact_with_model, model=models)
+#+END_SRC
+
+* Model 4: Impact of vaccination delay and capacity during an epidemic
+
+#+BEGIN_SRC python
+def f_model_4(x, t, beta, a, efficacy, gamma, N, vacc_per_day, start_vacc, end_vacc):
+    S = x[0]
+    I = x[1]
+    R = x[2]
+    Sv = x[3]
+    Iv = x[4]
+    Rv = x[5]
+
+    if t < start_vacc or t > end_vacc:
+        vacc = 0
+    else:
+        vacc = vacc_per_day
+
+    new_infections_S = beta*a*S*(I+Iv)/N
+    new_infections_Sv = beta*a*Sv*(I+Iv)/N
+    non_vacc = S + I + R
+    dS_dt = - new_infections_S - vacc*S/non_vacc
+    dI_dt = new_infections_S - gamma*I - vacc*I/non_vacc
+    dR_dt = gamma*I - vacc*R/non_vacc
+    dSv_dt = - new_infections_Sv + (1-efficacy)*vacc*S/non_vacc
+    dIv_dt = new_infections_Sv - gamma*Iv + vacc*I/non_vacc
+    dRv_dt = gamma*Iv + vacc*R/non_vacc + efficacy*vacc*S/non_vacc
+    dC_dt = new_infections_S + new_infections_Sv
+
+    return [dS_dt, dI_dt, dR_dt, dSv_dt, dIv_dt, dRv_dt, dC_dt]
+
+
+def model_4(beta=0.02,
+            a=10,
+            efficacy=0.85,
+            one_over_gamma=20.0,
+            start_vacc=30,
+            vacc_per_day=200,
+            duration_vacc=30,
+            initial_I=1.0,
+            N=10000.0,
+            max_time=365.0):
+
+    end_vacc = start_vacc + duration_vacc
+
+    ts = np.linspace(0, max_time, resolution)
+    x0 = [N-initial_I, initial_I, 0, 0, 0, 0, 0]
+    xs = odeint(f_model_4, x0, ts, args=(beta, a, efficacy, 1/one_over_gamma, N, vacc_per_day, start_vacc, end_vacc))
+
+    legends = ['Total susceptible',
+               'Total infectious',
+               'Cumulative infected',
+               'Vaccinated']
+
+    total_S = xs[:, 0] + xs[:, 3]
+    total_I = xs[:, 1] + xs[:, 4]
+    cum_infected = xs[:, 6]
+    vaccinated = xs[:, 3] + xs[:, 4] + xs[:, 5]
+
+    ys = np.vstack([total_S, total_I, cum_infected, vaccinated]).T
+
+    plt.plot(ts, ys)
+    plt.legend(legends)
+    plt.xlabel(xlabel)
+    plt.ylim([0, np.sum(xs[0])])
+    plt.show()
+
+    return xs
+#+END_SRC
+
+#+BEGIN_SRC python
+model_4()
+#+END_SRC
+
+** Interacting with model 4
+
+#+BEGIN_SRC python
+default_sliders['efficacy'] = (0, 1, 0.01)
+default_sliders['start_vacc'] = (0, 30*11, 1)
+default_sliders['vacc_per_day'] = (0, 800, 1)
+default_sliders['duration_vacc'] = (1, 30*6, 1)
+
+models = [model_1, model_2, model_3, model_4]
+#+END_SRC
+
+#+BEGIN_SRC python
 interact(interact_with_model, model=models)
 #+END_SRC
 
