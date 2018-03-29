@@ -57,7 +57,7 @@ def f_model_1(x, t, beta, a, mu, w, gamma, N):
 
     dS_dt = mu*N - beta*a*S*I/N + w*R - mu*S
     dI_dt = beta*a*S*I/N - gamma*I - mu*I
-    dR_dt = gamma*I - mu*R + w*R
+    dR_dt = gamma*I - mu*R - w*R
 
     return [dS_dt, dI_dt, dR_dt]
 #+END_SRC
@@ -115,6 +115,7 @@ def plot_model(ts, xs):
     plt.plot(ts, xs)
     plt.legend(legends)
     plt.xlabel(xlabel)
+    plt.ylim([0, np.sum(xs[0])])
     plt.show()
 
 
