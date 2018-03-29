@@ -39,13 +39,14 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} S(t)
 \\ \frac{\mathrm{d}}{\mathrm{d}t} I(t)
 \\ \frac{\mathrm{d}}{\mathrm{d}t} R(t) \end{bmatrix}
-= \begin{bmatrix} -\mu N(t) - \frac{\beta a S(t) I(t)}{N} + w R(t) -\mu S(t)
+= \begin{bmatrix} \mu N(t) - \frac{\beta a S(t) I(t)}{N} + w R(t) -\mu S(t)
 \\ \frac{\beta a S(t) I(t)}{N} - \gamma I(t) - \mu I(t) \\ \gamma
-I(t) - \mu R(t) + w R(t)
+I(t) - \mu R(t) - w R(t)
 \end{bmatrix}$$
 
-plus and initial condition determined by $I(0)$ and $R(0)$ (the
-initial population has to be $N$).
+plus and initial condition determined by how many individuals are
+infected at the start of the epidemic, $I(0)$, and how many are
+protected $R(0)$.
 
 ** Defining f
 
@@ -204,7 +205,7 @@ http://ipywidgets.readthedocs.io/en/latest/examples/Widget%20List.html
 
 * Model 2: continuous-time epidemic
 
-Model 2 has the equations:
+In Model 2 we do not account for births and deaths:
 
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} S(t)
@@ -212,10 +213,11 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 \\ \frac{\mathrm{d}}{\mathrm{d}t} R(t) \end{bmatrix}
 = \begin{bmatrix} - \frac{\beta a S(t) I(t)}{N} + w R(t)
 \\ \frac{\beta a S(t) I(t)}{N} - \gamma I(t) \\ \gamma
-I(t)  + w R(t)
+I(t) - w R(t)
 \end{bmatrix}$$
 
-and the initial condition:
+but we assume that a certain percentage $p$ of the population is
+vaccinated before the start of the epidemic, and are thus protected:
 
 $$\mathbf{x_0}
 = \begin{bmatrix} N - I_0 - p N
@@ -273,8 +275,8 @@ interact(model_2, **default_sliders)
 
 * Model 3: continuous-time epidemic (with final size)
 
-We can modify model 2 to keep track of the cumulative infections ($C$)
-by using the equations:
+We can modify model 2 to find the final size of the epidemic, by
+keeping track of the cumulative infections ($C$) using the equations:
 
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} S(t)
@@ -283,7 +285,7 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 \\ \frac{\mathrm{d}}{\mathrm{d}t} C(t)\end{bmatrix}
 = \begin{bmatrix} - \frac{\beta a S(t) I(t)}{N} + w R(t)
 \\ \frac{\beta a S(t) I(t)}{N} - \gamma I(t) \\ \gamma
-I(t)  + w R(t) \\
+I(t) - w R(t) \\
 \frac{\beta a S(t) I(t)}{N}
 \end{bmatrix}$$
 
