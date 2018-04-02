@@ -341,32 +341,66 @@ interact(model_2, **default_sliders)
 
 * Model 4: Impact of vaccination delay and capacity during an epidemic
 
+With an epidemic model we will study the effect of vaccination during
+an epidemic, as opposed to before the epidemic as we did in
+Model 2. For that we will keep track of non-vaccinated (superscript
+${}^n$) and vaccinated (superscript ${}^v$) individuals in different
+classes.
+
+$$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
+= \begin{bmatrix}
+\frac{\mathrm{d}}{\mathrm{d}t} S^n(t) \\
+\frac{\mathrm{d}}{\mathrm{d}t} I^n(t) \\
+\frac{\mathrm{d}}{\mathrm{d}t} R^n(t) \\
+\frac{\mathrm{d}}{\mathrm{d}t} S^v(t) \\
+\frac{\mathrm{d}}{\mathrm{d}t} I^v(t) \\
+\frac{\mathrm{d}}{\mathrm{d}t} R^v(t) \\
+\frac{\mathrm{d}}{\mathrm{d}t} C(t)
+\end{bmatrix} = \begin{bmatrix} -
+\beta a \frac{I^n(t)+I^v(t)}{N} S^n(t) - V(t) \\
+\beta a \frac{I^n(t)+I^v(t)}{N} S^n(t) - \gamma I^n(t) \\
+\gamma I^n(t) \\ -
+\beta a \frac{I^n(t)+I^v(t)}{N} S^v(t) + (1-\epsilon) V(t) \\
+\beta a \frac{I^n(t)+I^v(t)}{N} S^v(t) - \gamma I^v(t) \\
+\gamma I^v(t) + \epsilon V(t) \\
+\beta a \frac{I^n(t)+I^v(t)}{N} (S^n(t) + S^v(t))
+\end{bmatrix} $$
+
+and the initial condition:
+
+$$\mathbf{x_0}
+= \begin{bmatrix} N - I_0 - p N
+\\ I_0 \\ pN \\ 0 \\ 0 \\ 0 \\ 0\end{bmatrix}$$
+
+where $V(t)$ represents the vaccinations per day at time $t$ and
+$\epsilon$ the vaccine efficacy.
+
 #+BEGIN_SRC python
-def f_model_4(x, t, beta, a, efficacy, gamma, N, vacc_per_day, start_vacc, end_vacc):
-    S = x[0]
-    I = x[1]
-    R = x[2]
+def f_model_4(x, t, beta, a, efficacy, gamma, N, vacc_per_day, start_vacc, duration_vacc):
+    Sn = x[0]
+    In = x[1]
+    Rn = x[2]
     Sv = x[3]
     Iv = x[4]
     Rv = x[5]
 
-    if t < start_vacc or t > end_vacc:
-        vacc = 0
+    if t < start_vacc or t > start_vacc + duration_vacc:
+        V = 0
     else:
-        vacc = vacc_per_day
+        V = vacc_per_day
 
-    new_infections_S = beta*a*S*(I+Iv)/N
-    new_infections_Sv = beta*a*Sv*(I+Iv)/N
-    non_vacc = S + I + R
-    dS_dt = - new_infections_S - vacc*S/non_vacc
-    dI_dt = new_infections_S - gamma*I - vacc*I/non_vacc
-    dR_dt = gamma*I - vacc*R/non_vacc
-    dSv_dt = - new_infections_Sv + (1-efficacy)*vacc*S/non_vacc
-    dIv_dt = new_infections_Sv - gamma*Iv + vacc*I/non_vacc
-    dRv_dt = gamma*Iv + vacc*R/non_vacc + efficacy*vacc*S/non_vacc
-    dC_dt = new_infections_S + new_infections_Sv
+    new_infections_n = beta*a*(In+Iv)/N*Sn
+    new_infections_v = beta*a*(In+Iv)/N*Sv
 
-    return [dS_dt, dI_dt, dR_dt, dSv_dt, dIv_dt, dRv_dt, dC_dt]
+    dSn_dt = - new_infections_n - V
+    dIn_dt = new_infections_n - gamma*In
+    dRn_dt = gamma*In
+    dSv_dt = - new_infections_v + (1-efficacy)*V
+    dIv_dt = new_infections_v - gamma*Iv
+    dRv_dt = gamma*Iv + efficacy*V
+    dC_dt = new_infections_n + new_infections_v
+
+    return [dSn_dt, dIn_dt, dRn_dt, dSv_dt, dIv_dt, dRv_dt, dC_dt]
 
 
 def model_4(beta=0.02,
@@ -380,11 +414,9 @@ def model_4(beta=0.02,
             N=10000.0,
             max_time=365.0):
 
-    end_vacc = start_vacc + duration_vacc
-
     ts = np.linspace(0, max_time, resolution)
     x0 = [N-initial_I, initial_I, 0, 0, 0, 0, 0]
-    xs = odeint(f_model_4, x0, ts, args=(beta, a, efficacy, 1/one_over_gamma, N, vacc_per_day, start_vacc, end_vacc))
+    xs = odeint(f_model_4, x0, ts, args=(beta, a, efficacy, 1/one_over_gamma, N, vacc_per_day, start_vacc, duration_vacc))
 
     total_S = xs[:, 0] + xs[:, 3]
     total_I = xs[:, 1] + xs[:, 4]
