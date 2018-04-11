@@ -30,5 +30,4 @@ block press Shift and the Enter key.
 * Code
 
 The code is provided as [[file:SIR_models.ipynb][one Jupyter notebook]]. To download the file,
-after accessing it, click on "Raw" and then save it from your browser
-(usually Control-s).
+right click on this [[https://github.com/alfaromurillo/sir_models_intro/blob/master/SIR_models.ipynb?raw=true][link]] and choose 'Save link as...'
