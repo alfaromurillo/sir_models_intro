@@ -345,7 +345,7 @@ With an epidemic model we will study the effect of vaccination during
 an epidemic, as opposed to before the epidemic as we did in
 Model 2. For that we will keep track of non-vaccinated (superscript
 ${}^n$) and vaccinated (superscript ${}^v$) individuals in different
-classes.
+classes. The system of differential equations is in this case:
 
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}
@@ -416,7 +416,10 @@ def model_4(beta=0.02,
 
     ts = np.linspace(0, max_time, resolution)
     x0 = [N-initial_I, initial_I, 0, 0, 0, 0, 0]
-    xs = odeint(f_model_4, x0, ts, args=(beta, a, efficacy, 1/one_over_gamma, N, vacc_per_day, start_vacc, duration_vacc))
+    xs = odeint(f_model_4, x0, ts, args=(beta, a, efficacy,
+                                         1/one_over_gamma, N,
+                                         vacc_per_day, start_vacc,
+                                         duration_vacc))
 
     total_S = xs[:, 0] + xs[:, 3]
     total_I = xs[:, 1] + xs[:, 4]
