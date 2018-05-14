@@ -5,29 +5,20 @@ applied epidemiology that will be held on June 22, 2018 as part of the
 [[http://icmb2018.bucea.edu.cn/index.htm][6th International Conference on Mathematical Biology]], in Beijing, PR
 China.
 
-This repository provides the code for the hands-on practical exercises
+This repository contains the code for the hands-on practical exercises
 in the Python programming language.
 
 * Instructions
 
-To use the code provided you will require the Jupyter notebook and a
-Python installation with the SciPy, NumPy, Matplotlib and ipywidgets
-libraries, as well as all their dependencies.
+The code can be run from your browser visiting:
 
-The easiest way to obtain every requirement is to install the Anaconda
-Distribution, which includes everything needed (plus a lot more):
+https://mybinder.org/v2/gh/alfaromurillo/sir_models_intro/master?filepath=SIR_models.ipynb
+
+Alternatively, you could download the notebook (right click on this
+[[https://github.com/alfaromurillo/sir_models_intro/blob/master/SIR_models.ipynb?raw=true][link]] and choose 'Save link as...') and run it in your computer if you
+have the Jupyter Notebook and a Python installation with the SciPy,
+Matplotlib and ipywidgets libraries. The easiest way to install the
+Jupyter Notebook is to install the Anaconda Distribution, which
+includes every dependence needed (plus a lot more):
 https://www.anaconda.com/download. Follow the instructions there for
 your appropriate operative system.
-
-If you do not want to install anything in your computer, you can also
-run the code online. This method will be slower and you will have to
-copy and paste each block of code. To proceed this way go to:
-https://jupyter.org/try and click on "Try Jupyter with Python". After
-the page loads, click on "Insert", "Insert Cell Below" and start
-copying and pasting the code from [[file:SIR_models.ipynb][the Jupyter notebook]]. To run each
-block press Shift and the Enter key.
-
-* Code
-
-The code is provided as [[file:SIR_models.ipynb][one Jupyter notebook]]. To download the file,
-right click on this [[https://github.com/alfaromurillo/sir_models_intro/blob/master/SIR_models.ipynb?raw=true][link]] and choose 'Save link as...'
