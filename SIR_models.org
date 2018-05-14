@@ -11,23 +11,24 @@ from ipywidgets import interact
 
 * Solving an ODE model
 
-A general system of differential equations is of the form:
+A general differential equations system is of the form:
 
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} x_1(t)\\ \vdots
 \\ \frac{\mathrm{d}}{\mathrm{d}t} x_n(t) \end{bmatrix} = f(\mathbf{x}(t), t,
 \mathbf{z}),$$
 
-where $\mathbf{x}(t)$ and $\mathbf{z}$ are vectors and $f$ is a function that maps to
-a vector. We also have to provide an initial condition:
+where $\mathbf{x}(t)$ and $\mathbf{z}$ are vectors and $f$ is a
+function that maps to a vector. We also have to provide an initial
+condition:
 
 $$\mathbf{x}(0) = \mathbf{x_0}.$$
 
 For us, the $\mathbf{x}$ represents all the classes in our model,
 $\mathbf{z}$ all the parameters in our model and $t$ represents time.
 
-To solve an ODE in Python we have define the function $f$ and provide
-the initial condition $\mathbf{x_0}$.
+To solve an ODE in Python we have to define the function $f$ and
+provide the initial condition $\mathbf{x_0}$.
 
 * Model 1: continuous-time endemic
 
@@ -127,7 +128,7 @@ resolution = 1000
 def model_1(beta=0.05,
             a=10.0,
             mu=0.001,
-            w=0.01,
+            w=0.00,
             one_over_gamma=5.0,
             initial_I=1,
             initial_R=0,
