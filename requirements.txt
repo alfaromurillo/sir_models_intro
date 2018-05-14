@@ -1,2 +1,3 @@
+matplolib=2.2.2
 scipy==1.1.0
-ipywidgets==7.1.2
+ipywidgets==7.2.1
