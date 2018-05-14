@@ -455,5 +455,5 @@ interact(model_4, **default_sliders)
 #+END_SRC
 
 # Local Variables:
-# eval: (org-src-preserve-indentation t)
+# org-src-preserve-indentation: t
 # End:
