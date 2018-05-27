@@ -338,6 +338,91 @@ model_2()
 interact(model_2, **default_sliders)
 #+END_SRC
 
+* Model 3: An epidemic model with two age groups
+
+#+BEGIN_SRC python
+def f_model_3(x, t, beta, a1, a2, c11, c12, c21, c22, w, gamma, v1, v2, N1, N2):
+    S1 = x[0]
+    I1 = x[1]
+    R1 = x[2]
+    S2 = x[3]
+    I2 = x[4]
+    R2 = x[5]
+
+    dS1_dt = - beta*a1*S1*(c11*I1/N1 + c12*I2/N2) - v1*S1 + w*R1
+    dI1_dt = beta*a1*S1*(c11*I1/N1 + c12*I2/N2) - gamma*I1
+    dR1_dt = gamma*I1 + v1*S1 -w*R1
+    dS2_dt = - beta*a2*S2*(c21*I1/N1 + c22*I2/N2) - v2*S2 + w*R2
+    dI2_dt = beta*a2*S2*(c21*I1/N1 + c22*I2/N2) - gamma*I2
+    dR2_dt = gamma*I2 + v2*S2 -w*R2
+
+    return [dS1_dt, dI1_dt, dR1_dt, dS2_dt, dI2_dt, dR2_dt]
+
+
+def model_3(beta=0.05,
+            a1=15,
+            a2=12,
+            e1=0.28,
+            e2=0.61,
+            w=0.00,
+            one_over_gamma=5.0,
+            v1=0.03,
+            v2=0.015,
+            initial_I1=1.0,
+            initial_I2=1.0,
+            N1=2700,
+            N2=4500,
+            max_time=50.0):
+
+
+    f1 = (1 -e1)*a1*N1/((1-e1)*a1*N1+(1-e2)*a2*N2)
+    f2 = 1 - f1
+    c11 = e1 + (1-e1)*f1
+    c12 = (1-e1)*f2
+    c21 = (1-e2)*f1
+    c22 = e2 + (1-e2)*f2
+
+    ts = np.linspace(0, max_time, resolution)
+    x0 = [N1-initial_I1, initial_I1, 0, N2-initial_I2, initial_I2, 0]
+    xs = odeint(f_model_3, x0, ts, args=(beta, a1, a2, c11, c12, c21,
+                                         c22, w, 1/one_over_gamma, v1,
+                                         v2, N1, N2))
+
+    plot_results(ts, xs[:, :3], ['S1', 'I1', 'R1'])
+    plot_results(ts, xs[:, 3:], ['S2', 'I2', 'R2'])
+
+    R01 = beta*a1*one_over_gamma
+    R02 = beta*a2*one_over_gamma
+    R0 = (R01*c11 + R02*c22 + np.sqrt((R01*c11-R02*c22)**2+4*R01*c12*R02*c21))/2
+
+    print("R01: {:.2f}".format(R01))
+    print("R02: {:.2f}".format(R02))
+    print("R0: {:.2f}".format(R0))
+
+    return xs
+#+END_SRC
+
+#+BEGIN_SRC python
+model_3()
+#+END_SRC
+
+** Interacting with model 3
+
+#+BEGIN_SRC python
+default_sliders['a1'] = default_sliders['a']
+default_sliders['a2'] = default_sliders['a']
+default_sliders['v1'] = (0, 1, 0.001)
+default_sliders['v2'] = default_sliders['v1']
+default_sliders['initial_I1'] = default_sliders['initial_I']
+default_sliders['initial_I2'] = default_sliders['initial_I']
+default_sliders['N1'] = default_sliders['N']
+default_sliders['N2'] = default_sliders['N']
+#+END_SRC
+
+#+BEGIN_SRC python
+interact(model_3, **default_sliders)
+#+END_SRC
+
 * Model 4: Impact of vaccination delay and capacity during an epidemic
 
 With an epidemic model we will study the effect of vaccination during
