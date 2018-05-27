@@ -94,8 +94,6 @@ plt.show()
 #+END_SRC
 
 #+BEGIN_SRC python
-results_model_1 = model_1(0.05, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
-
 plt.plot(np.linspace(0, 300, 1000), results_model_1)
 
 plt.xlabel("Time (days)")
