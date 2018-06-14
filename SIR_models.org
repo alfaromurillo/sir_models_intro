@@ -468,12 +468,10 @@ interact(model_1, **default_sliders)
 #+END_SRC
 
 ** Model 1, just the necessary code
-:PROPERTIES:
-:CUSTOM_ID: model-1-necessary
-:END:
 
 #+BEGIN_SRC python
 import numpy
+from scipy.integrate import odeint
 from matplotlib import pyplot
 from ipywidgets import interact
 
@@ -496,6 +494,9 @@ def f_model_1(x, t, beta, a, mu, w, gamma, N):
     dR_dt = gamma*I - mu*R - w*R
 
     return numpy.array([dS_dt, dI_dt, dR_dt])
+
+
+default_resolution = 1000
 
 
 def model_1(beta=0.05,
