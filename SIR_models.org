@@ -1,17 +1,128 @@
 #+TITLE: Introduction to SIR models in Python
 
-* Importing libraries
+* Instructions
 
+This is a Jupyter notebook. A notebook contains cells, some of them
+contain just text, such as this one that you are reading right
+now. The other important type of cell in a notebook is a code
+cell. You can run code in the python programming language that is
+contained in a code cell. Code cells look like this:
 #+BEGIN_SRC python
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.integrate import odeint
-from ipywidgets import interact
+55/34
+#+END_SRC
+#+BEGIN_SRC python
+(1+5**(1/2))/2 # notice that x**y means x to the power of y in python
+# notice also that comments in python start with a hash (#)
+#+END_SRC
+
+By clicking over a code cell, and then pressing the 'shift' key and
+the 'enter' key together, you can run that particular code cell and
+advance to next cell. Try to run the code contained in the first code
+cell above.
+
+The result of the division of 55 over 34 should appear just below the
+code. Try now to run the next code cell.
+
+If you are in a rush and do not want to learn much about the python
+programming language and just care about observing the results of the
+different models you can skip to Section [Model 1, just the necessary code](#Model-1,-just-the-necessary-code)
+and just advance cell by cell by pressing Shift+Enter.
+
+Other ways to run a code cell is to click in the "Cell" menu and
+select "Run Cells", or to use the "Run" button that is below the
+"Cell" menu. If you are interested in learning more about the Jupyter
+notebook interface you can click in the "Help" menu and select "User
+interface Tour". However, pressing Shift+Enter for each cell in this
+tutorial is all you will need to do.
+
+Notice that the first code cell starts with "In [1]:" and its result
+with "Out[1]:". The second code cell, starts with "In [2]:" and its
+result with "Out[2]:".
+
+You can also modify any code cell and re-run it to obtain a different
+result. Try to modify the first cell and calculate the result of the
+division of 89 over 55. In that case the you should see now that the
+code cell starts with "In [3]:" and its result with "Out[3]:", meaning
+that it is the third evaluation that you have done.
+
+
+* Preliminaries: Vectors in python
+
+To represent and do operations with vectors in python we will use the
+NumPy library. A library in python is a collection of methods and
+constants.
+
+Let's start by importing the library:
+#+BEGIN_SRC python
+import numpy
+#+END_SRC
+
+Now we have access to all the methods that the NumPy library
+provides. For example NumPy provides the =numpy.cos= method that
+computes the cosine of a number:
+#+BEGIN_SRC python
+numpy.cos(0)
+#+END_SRC
+it also provides the number pi as the constant =numpy.pi=:
+#+BEGIN_SRC python
+numpy.cos(numpy.pi)
+#+END_SRCe
+
+An array is the most basic element of the NumPy library and we will
+represent vectors and matrices as arrays. For example:
+#+BEGIN_SRC python
+numpy.array([1, 1, 1])
+#+END_SRC
+represents the vector $(1, 1, 1)$ in $\mathbb{R}^3$, whereas:
+#+BEGIN_SRC python
+numpy.array([[1, 0], [0, 1]])
+#+END_SRC
+represents the 2x2 identity matrix.
+
+We will use the NumPy method =linspace= in a little bit, so let's
+check out how it works:
+#+BEGIN_SRC python
+numpy.linspace(0, 100, 5)
+#+END_SRC
+The method takes as arguments three numbers =x, y, z= and gives back
+an array with =z= numbers equally spaced between =x= and =y=.
+
+Let's store a vector in a variable:
+#+BEGIN_SRC python
+v = numpy.linspace(0, 100, 5)
+#+END_SRC
+Notice that this code cell did not output anything when it is
+run. However, now we have the variable =v= available, and it has the
+content of the result of =numpy.linspace(0, 100, 5)=, we can call it
+back whenever we want:
+#+BEGIN_SRC python
+v
+#+END_SRC
+
+To access the a specific entry of a vector we use square brackets and
+indicate the number of the element of the array that we want to
+access:
+#+BEGIN_SRC python
+v[1]
+#+END_SRC
+Notice that the numbering in python starts with 0, so this will be
+the first entry of the vector =v=:
+#+BEGIN_SRC python
+v[0]
+#+END_SRC
+Therefore this code cell should give you an error:
+#+BEGIN_SRC python
+v[5]
+#+END_SRC
+To access the last entry of =v= you should use:
+#+BEGIN_SRC python
+v[4]
 #+END_SRC
 
 * Solving an ODE model
 
-A general differential equations system is of the form:
+An system of ordinary differential equations (ODE) can be written in
+its most general form as:
 
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} x_1(t)\\ \vdots
@@ -19,20 +130,22 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 \mathbf{z}),$$
 
 where $\mathbf{x}(t)$ and $\mathbf{z}$ are vectors and $f$ is a
-function that maps to a vector. We also have to provide an initial
-condition:
+function that maps to a vector of the same dimension as
+$\mathbf{x}(t)$. We also have to provide an initial condition for the
+system:
 
 $$\mathbf{x}(0) = \mathbf{x_0}.$$
 
-For us, the $\mathbf{x}$ represents all the classes in our model,
-$\mathbf{z}$ all the parameters in our model and $t$ represents time.
+For us, the vector $\mathbf{x}(t)$ represents all the classes in our
+model at a particular time $t$, and the vector $\mathbf{z}$ represents
+all the parameters in our model.
 
-To solve an ODE in Python we have to define the function $f$ and
-provide the initial condition $\mathbf{x_0}$.
+To solve an ODE in Python we have to define the function $f$ as python
+function and provide the initial condition $\mathbf{x_0}$.
 
 * Model 1: continuous-time endemic
 
-Model 1 has the equations
+Let's start with Model 1, which has the equations
 
 $$\mathbf{x} = \begin{bmatrix} S \\ I \\ R \end{bmatrix}$$
 
@@ -47,9 +160,19 @@ I(t) - \mu R(t) - w R(t)
 
 plus and initial condition determined by how many individuals are
 infected at the start of the epidemic, $I(0)$, and how many are
-protected $R(0)$.
+protected $R(0)$ ($S(0)$ has to be equal to $N-I(0)-R(0)$).
 
-** Defining f
+As stated before, we need to define the function $f$ in python to
+obtain the solution of the ODE.
+
+** Defining a function in python
+
+Function definitions in python start with =def= then have the function
+name that you want to define, all the arguments that the function
+takes in parenthesis and separated by a comma, and a semicolon
+(:). The code of the function is indented and the directive =return=
+determines what will be returned when evaluating the function. Let's
+define that for Model 1:
 
 #+BEGIN_SRC python
 def f_model_1(x, t, beta, a, mu, w, gamma, N):
@@ -61,66 +184,318 @@ def f_model_1(x, t, beta, a, mu, w, gamma, N):
     dI_dt = beta*a*S*I/N - gamma*I - mu*I
     dR_dt = gamma*I - mu*R - w*R
 
-    return [dS_dt, dI_dt, dR_dt]
+    return numpy.array([dS_dt, dI_dt, dR_dt])
 #+END_SRC
 
-** Solving the model
+Notice that just as we described above for the general form of an ODE
+system the function takes =x=, which is a vector (represented as a
+NumPy array), then =t= which is the time, and then the parameters of
+the model, in our case =beta=, =a=, =mu=, =w=, =gamma= and =N=. The
+function returns another vector (again represented as a NumPy array)
+of the same dimension as =x= (3, because we have three classes).
+
+** Solving ODE systems in python
+
+To obtain the solution of an ODE system in python we need a method to
+solve ODE systems. The method that we will use is part of the SciPy
+library and it is contained within the module =integrate=.  A module
+in python is a subset of a library, it is just a division of a library
+that is used when a library is very big, as it is the case for the
+SciPy library. Because the method =odeint= is the only method of the
+whole SciPy library that we need, we can import just that method:
 
 #+BEGIN_SRC python
+from scipy.integrate import odeint
+#+END_SRC
+
+The method =odeint= takes as arguments a function (the $f$ in the ODE
+general form), an initial condition (the vector $\mathbf{x}_0$), the
+times for which we want to obtain the results, and the extra arguments
+of the function (the parameters $\mathbf{z}$) in parenthesis and
+separated by commas.
+
+So suppose that you want to know the solution of Model 1 for 10 days
+and 100 days after the start of the outbreak ($t=10$ and $t=100$) when
+the parameters are $\beta=0.05$, $a=10$, $\mu=0.001$, $w=0$,
+$\gamma=1/5$, the total population is $N=100$, and given the initial
+condition $S(0)=99$, $I(0)=1$, $R(0)=0$ (in other words one infected
+individual and the rest of the population susceptible). Then you would
+use the method =odeint= like this:
+
+#+BEGIN_SRC python
+odeint(f_model_1, [99, 1, 0], [10, 100], (0.05, 10, 0.001, 0, 1/5, 100))
+#+END_SRC
+
+Notice that the result is a matrix with two rows and three
+columns. The columns represent the values of $S$, $I$ and $R$ and the
+rows represent the times for which we wanted the results ($t=10$ and
+$t=100$ in this case). Numbers are by default represented in
+exponential notation, =1.60361708e+01= means $1.60361708 \times 10^1 =
+16.0361708$, whereas, =2.73164326e-03= means $2.73164326 \times
+10^{-3}$.
+
+To be able to explore the dynamics of any model, we obviously need
+more points in time. That is why the NumPy method =linspace= is
+helpful. For example we can output all the results for the first 100
+days of the epidemic with a resolution of half a day by asking for 200
+values of $t$ between $t=0$ and say $t=100$:
+
+#+BEGIN_SRC python
+odeint(f_model_1, [99, 1, 0], numpy.linspace(0, 100, 200), (0.05, 10, 0.001, 0, 1/5, 100))
+#+END_SRC
+
+The result now has 100 rows (and still 3 rows for $S$, $I$, $R$).
+
+Let us save a little bit of writing by defining a new function that
+solves Model 1 for all times between $t=0$ and an arbitrary maximum
+time, with a default resolution of 200 times:
+
+#+BEGIN_SRC python
+default_resolution = 200
+
 def model_1(beta, a, mu, w, one_over_gamma, initial_I, initial_R, N, max_time):
 
-    ts = np.linspace(0, max_time, 1000)
+    ts = numpy.linspace(0, max_time, default_resolution)
     x0 = [N-initial_I-initial_R, initial_I, initial_R]
-    xs = odeint(f_model_1,
-                x0,
-                ts,
-                args=(beta, a, mu, w, 1/one_over_gamma, N))
+    xs = odeint(f_model_1, x0, ts, (beta, a, mu, w, 1/one_over_gamma, N))
 
     return xs
 #+END_SRC
 
-** Running our first model
+Now if we want the store the results of Model 1 up to time $t=300$,
+for the parameters $\beta=0.05$, $a=10$, $\mu=0.001$, $w=0.01$,
+$\gamma=1/5$, and the total population is $N=100$ given the initial
+condition $S(0)=99$, $I(0)=1$, $R(0)=0$ we can call the function that
+we just defined:
 
 #+BEGIN_SRC python
-model_1(0.05, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
+results_model_1 =  model_1(0.05, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
+results_model_1
 #+END_SRC
 
-** Plotting the results
+The variable =results_model_1= contains now the result of the ODE
+system. Notice we defined =model_1= to take $1/\gamma$ not $\gamma$.
+
+If we want to change the results for example for $\beta=0.04$, then we
+can evaluate:
 
 #+BEGIN_SRC python
-results_model_1 = model_1(0.05, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
-plt.plot(results_model_1)
-plt.show()
+results_model_1 = model_1(0.04, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
+results_model_1
 #+END_SRC
+
+Notice that =default_resolution= is just a variable, and we can change
+it whenever we want and that will affect the results obtained when the
+function =model_1= is called. Let's check that using the method NumPy
+method =shape= to see the dimensions of the NumPy arrays obtained:
 
 #+BEGIN_SRC python
-plt.plot(np.linspace(0, 300, 1000), results_model_1)
-
-plt.xlabel("Time (days)")
-
-plt.legend(["S", "I", "R"])
-
-plt.show()
+numpy.shape(results_model_1)
 #+END_SRC
 
-** Separate plot function
+That is, =results_model_1= has 200 rows and 3 columns. Now if we
+change the variable =default_resolution=, we obtain 1000 rows and 3
+columns:
+
+#+BEGIN_SRC python
+default_resolution = 1000
+results_model_1 = model_1(0.04, 10, 0.001, 0.01, 5, 1, 0, 100, 300)
+numpy.shape(results_model_1)
+#+END_SRC
+
+Obviously, it is not very helpful to see results as a 1000 by 3 matrix
+of numbers, so we will visualize results as graphs.
+
+** Plotting
+
+To plot results we need access to another library, Matplotlib. We will
+use several methods from its module =pyplot=, so let's import the
+whole module:
+
+#+BEGIN_SRC python
+from matplotlib import pyplot
+#+END_SRC
+
+Now all the methods of the module =pyplot= are available.
+
+The first two methods that we will need are =pyplot.plot= and
+=pyplot.show=, that unsurprisingly create a plot and show the
+plot. =pyplot.plot= needs to be provided with the x-values (for our
+case values of $t$) and y-values (for our case values of $S(t)$,
+$I(t)$, and $R(t)$). y-values have to be of the same size as the
+x-values, but we can plot several curves in the same graph by giving
+the y-values in a matrix form, as long as the number of rows in that
+matrix is the same as the dimension of the x-values. Luckily, this is
+exactly how we obtained our results:
+
+#+BEGIN_SRC python
+pyplot.plot(numpy.linspace(0, 300, default_resolution), results_model_1)
+pyplot.show()
+#+END_SRC
+
+We can make the graph a little bit nicer by adding a label for the
+x-axis and legends that help us distinguished the classes in the
+model:
+
+#+BEGIN_SRC python
+pyplot.plot(numpy.linspace(0, 300, default_resolution), results_model_1)
+
+pyplot.xlabel("Time (days)")
+
+pyplot.legend(["S", "I", "R"])
+
+pyplot.show()
+#+END_SRC
+
+We will be plotting a lot, so let's define a function that we can call
+later to save some time:
 
 #+BEGIN_SRC python
 def plot_results(ts, xs, legends):
-    plt.plot(ts, xs)
-    plt.legend(legends)
-    plt.xlabel("Time (days)")
-    plt.ylim([0, np.sum(xs[0])])
-    plt.show()
+    pyplot.plot(ts, xs)
+    pyplot.legend(legends)
+    pyplot.xlabel("Time (days)")
+    pyplot.ylim([0, numpy.sum(xs[0])]) # this sets the y-axis limit to the total population
+    pyplot.show()
 
-
-plot_results(np.linspace(0, 300, 1000), results_model_1, ["S", "I", "R"])
+plot_results(numpy.linspace(0, 300, default_resolution), results_model_1, ["S", "I", "R"])
 #+END_SRC
 
-** Improve model_1 and set default values
+** Setting default values
+
+It is cumbersome to have to write the value of each of the parameters
+of Model 1, whenever we want to call =model_1=, and besides we need to
+be careful with the order in which we provide the parameter values to
+the function =model_1=. We can avoid that problem by defining default
+values for the function =model_1=. Let's redefine the =model_1=
+function to incorporate default values, and also let's go further
+plotting the results and printing the value of $\mathcal{R}_0$ each
+time that we call the function =model_1=:
 
 #+BEGIN_SRC python
-resolution = 1000
+def model_1(beta=0.05,
+            a=10.0,
+            mu=0.001,
+            w=0.00,
+            one_over_gamma=5.0,
+            initial_I=1,
+            initial_R=0,
+            N=100,
+            max_time=300.0):
+
+    ts = numpy.linspace(0, max_time, default_resolution)
+    x0 = [N-initial_I-initial_R, initial_I, initial_R]
+    xs = odeint(f_model_1, x0, ts, (beta, a, mu, w, 1/one_over_gamma, N))
+
+    plot_results(ts, xs, ["S (susceptible)", "I (infectious)", "R (recovered)"])
+
+    R0 = beta*a/(1/one_over_gamma+mu)
+    print("R0 = {:.2f}".format(R0))
+    # this means print 'R0 = ' and then the value of the variable R0 as a float rounding to two digits
+
+    return xs
+#+END_SRC
+
+Now we can call the function =model_1= without parameters, and the
+default ones will be used:
+
+#+BEGIN_SRC python
+model_1()
+#+END_SRC
+
+We can also change just a couple of parameters and we do not need to
+worry about the order, so long as we tell exactly which ones are we changing:
+
+#+BEGIN_SRC python
+model_1(mu=0.002, beta=0.06)
+#+END_SRC
+
+** Interacting with the parameters
+
+=interact= is the last method from another library that we will need:
+
+#+BEGIN_SRC python
+from ipywidgets import interact
+#+END_SRC
+
+Let's see how it works:
+
+#+BEGIN_SRC python
+interact(model_1,
+         beta=(0.01, 0.1, 0.001),
+         a=(5, 15, 0.1),
+         mu=(0.0, 0.01, 0.0001),
+         w=(0, 0.1, 0.001),
+         one_over_gamma=(2.0, 30.0, 0.1),
+         N=(0, 20000, 50),
+         initial_I=(0, 50),
+         initial_R=(0, 50),
+         max_time=(1, 500, 10))
+#+END_SRC
+
+Notice that we give to =interact= as arguments the name of a function
+to interact with, in our case =model_1=, and then each of the
+arguments of that function in the form of 3 numbers: an initial value,
+a final value, and a step value. We can also just provide 2 numbers,
+as we did above for =initial_I= and =initial_R=, and the step value
+will be equal to 1 by default.
+
+Now you can change the values of the parameters very fast with the
+sliders, and see how they impact the results of the model.
+
+Since we will be using the same parameter range for the rest of the
+models, there is a nice trick that we can use by defining what is
+called a dictionary:
+
+#+BEGIN_SRC python
+default_sliders = {'beta':(0.01, 0.1, 0.001),
+                   'a':(5, 15, 0.1),
+                   'mu':(0.0, 0.01, 0.0001),
+                   'w':(0, 0.1, 0.001),
+                   'one_over_gamma':(2.0, 30.0, 0.1),
+                   'N':(1, 20000, 50),
+                   'initial_I':(0, 50),
+                   'initial_R':(0, 50),
+                   'max_time':(1, 500, 10)}
+#+END_SRC
+
+And now if we pass =**default_sliders= to any function, python will
+substitute that part with =beta=(0.01, 0.1, 0.001)=, =a=(5, 15, 0.1)=,
+etc. So this is exactly the same call that we had before:
+
+#+BEGIN_SRC python
+interact(model_1, **default_sliders)
+#+END_SRC
+
+** Model 1, just the necessary code
+:PROPERTIES:
+:CUSTOM_ID: model-1-necessary
+:END:
+
+#+BEGIN_SRC python
+import numpy
+from matplotlib import pyplot
+from ipywidgets import interact
+
+
+def plot_results(ts, xs, legends):
+    pyplot.plot(ts, xs)
+    pyplot.legend(legends)
+    pyplot.xlabel("Time (days)")
+    pyplot.ylim([0, numpy.sum(xs[0])])
+    pyplot.show()
+
+
+def f_model_1(x, t, beta, a, mu, w, gamma, N):
+    S = x[0]
+    I = x[1]
+    R = x[2]
+
+    dS_dt = mu*N - beta*a*S*I/N + w*R - mu*S
+    dI_dt = beta*a*S*I/N - gamma*I - mu*I
+    dR_dt = gamma*I - mu*R - w*R
+
+    return numpy.array([dS_dt, dI_dt, dR_dt])
 
 
 def model_1(beta=0.05,
@@ -133,47 +508,18 @@ def model_1(beta=0.05,
             N=100,
             max_time=300.0):
 
-    ts = np.linspace(0, max_time, resolution)
+    ts = numpy.linspace(0, max_time, default_resolution)
     x0 = [N-initial_I-initial_R, initial_I, initial_R]
-    xs = odeint(f_model_1,
-                x0,
-                ts,
-    args=(beta, a, mu, w, 1/one_over_gamma, N))
+    xs = odeint(f_model_1, x0, ts, (beta, a, mu, w, 1/one_over_gamma, N))
 
-    plot_results(ts, xs, ["S (susceptible)",
-                          "I (infectious)",
-                          "R (recovered)"])
+    plot_results(ts, xs, ["S (susceptible)", "I (infectious)", "R (recovered)"])
 
     R0 = beta*a/(1/one_over_gamma+mu)
     print("R0 = {:.2f}".format(R0))
 
     return xs
-#+END_SRC
 
-#+BEGIN_SRC python
-model_1()
-#+END_SRC
 
-#+BEGIN_SRC python
-model_1(mu=0.002, beta=0.06)
-#+END_SRC
-
-* Interacting with the parameters
-
-#+BEGIN_SRC python
-interact(model_1,
-         beta=(0.01, 0.1, 0.001),
-         a=(5, 15, 0.1),
-         mu=(0, 0.01, 0.0001),
-         w=(0, 0.1, 0.001),
-         one_over_gamma=(2, 30, 0.1),
-         N=(0, 1000, 10.0),
-         initial_I=(0, 50),
-         initial_R=(0, 50),
-         max_time=(1, 500, 10))
-#+END_SRC
-
-#+BEGIN_SRC python
 default_sliders = {'beta':(0.01, 0.1, 0.001),
                    'a':(5, 15, 0.1),
                    'mu':(0.0, 0.01, 0.0001),
@@ -208,6 +554,10 @@ $$\mathbf{x_0}
 = \begin{bmatrix} N - I_0 - p N
 \\ I_0 \\ pN \end{bmatrix}$$
 
+As we learned from Model 1, we just need to define the function $f$,
+and another function that calls =odeint= to solve the system and that
+plots the results using =plot_results=:
+
 #+BEGIN_SRC python
 def f_model_2(x, t, beta, a, p, w, gamma, N):
     S = x[0]
@@ -219,7 +569,7 @@ def f_model_2(x, t, beta, a, p, w, gamma, N):
     dI_dt = new_infections - gamma*I
     dR_dt = gamma*I - w*R
 
-    return [dS_dt, dI_dt, dR_dt]
+    return numpy.array([dS_dt, dI_dt, dR_dt])
 
 
 def model_2(beta=0.05,
@@ -231,16 +581,11 @@ def model_2(beta=0.05,
             N=100.0,
             max_time=100.0):
 
-    ts = np.linspace(0, max_time, resolution)
+    ts = numpy.linspace(0, max_time, default_resolution)
     x0 = [N-initial_I-p*N, initial_I, p*N]
-    xs = odeint(f_model_2,
-                x0,
-                ts,
-                args=(beta, a, p, w, 1/one_over_gamma, N))
+    xs = odeint(f_model_2, x0, ts, (beta, a, p, w, 1/one_over_gamma, N))
 
-    plot_results(ts, xs, ["S (susceptible)",
-                          "I (infectious)",
-                          "R (recovered)"])
+    plot_results(ts, xs, ["S (susceptible)", "I (infectious)", "R (recovered)"])
 
     R0 = beta*a*one_over_gamma
     Rv = (1-p)*R0
@@ -250,22 +595,58 @@ def model_2(beta=0.05,
     return xs
 #+END_SRC
 
+Now we can call =model_2= with the default parameters:
+
 #+BEGIN_SRC python
-  model_2()
+model_2()
 #+END_SRC
 
-** Interacting with model 2
+We can use =interact= again to see how the model behaves when the
+parameters change, because we already defined some default ranges for
+the parameters when we were interacting with Model 1, we can simply
+call:
+
+#+BEGIN_SRC python
+interact(model_2, **default_sliders)
+#+END_SRC
+
+Notice however that the variable $p$ has a strange range, =interact=
+allowed to set a negative value for $p$. Think about what $p$ is and
+why it cannot be negative.
+
+The problem is that when we defined =default_sliders=, we did not
+include $p$, because Model 1 did not have that as a parameter. Let's
+check the variable =default_sliders= again:
+
+#+BEGIN_SRC python
+default_sliders
+#+END_SRC
+
+Notice that it contains ranges for all arguments that the function
+=model_2= takes, except for $p$. We can fix it easily, without having
+to write again =default_sliders=, we just need to add another item:
 
 #+BEGIN_SRC python
 default_sliders['p'] = (0, 1, 0.05)
+#+END_SRC
 
+Now =default_sliders= has also the right range for $p$:
+
+#+BEGIN_SRC python
+default_sliders
+#+END_SRC
+
+and =interact= will work as wanted:
+
+#+BEGIN_SRC python
 interact(model_2, **default_sliders)
 #+END_SRC
 
 ** Computing the final size in Model 2
 
-We can modify model 2 to find the final size of the epidemic, by
-keeping track of the cumulative infections ($C$) using the equations:
+We can modify model 2 to find the final size of the epidemic, we do
+this by keeping track of the cumulative infections ($C$) using the
+equations:
 
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}\frac{\mathrm{d}}{\mathrm{d}t} S(t)
@@ -284,6 +665,9 @@ $$\mathbf{x_0}
 = \begin{bmatrix} N - I_0 - p N
 \\ I_0 \\ pN \\ 0\end{bmatrix}$$
 
+Let's modify the functions =f_model_2= and =model_2= to account for
+that:
+
 #+BEGIN_SRC python
 def f_model_2(x, t, beta, a, p, w, gamma, N):
     S = x[0]
@@ -296,7 +680,7 @@ def f_model_2(x, t, beta, a, p, w, gamma, N):
     dR_dt = gamma*I - w*R
     dC_dt = new_infections
 
-    return [dS_dt, dI_dt, dR_dt, dC_dt]
+    return numpy.array([dS_dt, dI_dt, dR_dt, dC_dt])
 
 
 def model_2(beta=0.05,
@@ -308,17 +692,11 @@ def model_2(beta=0.05,
             N=100,
             max_time=100):
 
-    ts = np.linspace(0, max_time, resolution)
+    ts = numpy.linspace(0, max_time, default_resolution)
     x0 = [N-initial_I-p*N, initial_I, p*N, 0]
-    xs = odeint(f_model_2,
-                x0,
-                ts,
-                args=(beta, a, p, w, 1/one_over_gamma, N))
+    xs = odeint(f_model_2, x0, ts, (beta, a, p, w, 1/one_over_gamma, N))
 
-    plot_results(ts, xs, ["S (susceptible)",
-                          "I (infectious)",
-                          "R (recovered)",
-                          "C (cumulative)"])
+    plot_results(ts, xs, ["S (susceptible)", "I (infectious)", "R (recovered)", "C (cumulative)"])
 
     R0 = beta*a*one_over_gamma
     Rv = (1-p)*R0
@@ -328,17 +706,24 @@ def model_2(beta=0.05,
     return xs
 #+END_SRC
 
+Everything should be working if we call =model_2= with the default
+parameter values:
+
 #+BEGIN_SRC python
 model_2()
 #+END_SRC
 
-** Interacting with model 2 (again)
+And also if we want to interact with the model, we can just call:
 
 #+BEGIN_SRC python
 interact(model_2, **default_sliders)
 #+END_SRC
 
 * Model 3: An epidemic model with two age groups
+
+By now you should be familiar with the way to solve ODE models in
+python, see if you can understand what each part of the code in the
+following code cells does:
 
 #+BEGIN_SRC python
 def f_model_3(x, t, beta, a1, a2, c11, c12, c21, c22, w, gamma, v1, v2, N1, N2):
@@ -356,7 +741,7 @@ def f_model_3(x, t, beta, a1, a2, c11, c12, c21, c22, w, gamma, v1, v2, N1, N2):
     dI2_dt = beta*a2*S2*(c21*I1/N1 + c22*I2/N2) - gamma*I2
     dR2_dt = gamma*I2 + v2*S2 -w*R2
 
-    return [dS1_dt, dI1_dt, dR1_dt, dS2_dt, dI2_dt, dR2_dt]
+    return numpy.array([dS1_dt, dI1_dt, dR1_dt, dS2_dt, dI2_dt, dR2_dt])
 
 
 def model_3(beta=0.05,
@@ -382,18 +767,16 @@ def model_3(beta=0.05,
     c21 = (1-e2)*f1
     c22 = e2 + (1-e2)*f2
 
-    ts = np.linspace(0, max_time, resolution)
+    ts = numpy.linspace(0, max_time, default_resolution)
     x0 = [N1-initial_I1, initial_I1, 0, N2-initial_I2, initial_I2, 0]
-    xs = odeint(f_model_3, x0, ts, args=(beta, a1, a2, c11, c12, c21,
-                                         c22, w, 1/one_over_gamma, v1,
-                                         v2, N1, N2))
+    xs = odeint(f_model_3, x0, ts, (beta, a1, a2, c11, c12, c21, c22, w, 1/one_over_gamma, v1, v2, N1, N2))
 
     plot_results(ts, xs[:, :3], ['S1', 'I1', 'R1'])
     plot_results(ts, xs[:, 3:], ['S2', 'I2', 'R2'])
 
     R01 = beta*a1*one_over_gamma
     R02 = beta*a2*one_over_gamma
-    R0 = (R01*c11 + R02*c22 + np.sqrt((R01*c11-R02*c22)**2+4*R01*c12*R02*c21))/2
+    R0 = (R01*c11 + R02*c22 + numpy.sqrt((R01*c11-R02*c22)**2+4*R01*c12*R02*c21))/2
 
     print("R01: {:.2f}".format(R01))
     print("R02: {:.2f}".format(R02))
@@ -405,8 +788,6 @@ def model_3(beta=0.05,
 #+BEGIN_SRC python
 model_3()
 #+END_SRC
-
-** Interacting with model 3
 
 #+BEGIN_SRC python
 default_sliders['a1'] = default_sliders['a']
@@ -423,13 +804,15 @@ default_sliders['N2'] = default_sliders['N']
 interact(model_3, **default_sliders)
 #+END_SRC
 
-* Model 4: Impact of vaccination delay and capacity during an epidemic
+* Bonus Model 4: Impact of vaccination delay and capacity during an epidemic
 
-With an epidemic model we will study the effect of vaccination during
-an epidemic, as opposed to before the epidemic as we did in
-Model 2. For that we will keep track of non-vaccinated (superscript
-${}^n$) and vaccinated (superscript ${}^v$) individuals in different
-classes. The system of differential equations is in this case:
+With this epidemic model we will study the effect of vaccination
+during an epidemic, as opposed to before the epidemic as we did in
+Model 2 (remember that what we did was modify the initial
+conditions). For that we will keep track of non-vaccinated
+(superscript ${}^n$) and vaccinated (superscript ${}^v$) individuals
+in different classes. The system of differential equations is in this
+case:
 
 $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 = \begin{bmatrix}
@@ -453,11 +836,17 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 and the initial condition:
 
 $$\mathbf{x_0}
-= \begin{bmatrix} N - I_0 - p N
-\\ I_0 \\ pN \\ 0 \\ 0 \\ 0 \\ 0\end{bmatrix}$$
+= \begin{bmatrix} N - I_0
+\\ I_0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0\end{bmatrix}$$
 
 where $V(t)$ represents the vaccinations per day at time $t$ and
 $\epsilon$ the vaccine efficacy.
+
+The interesting part in the definition of the model, is how we can
+incorporate the time dependent "parameter" vaccinations into the
+definition of $f$. For example assuming that you either vaccinate at
+the same fixed rate per day or don't vaccinate at all, we could
+define:
 
 #+BEGIN_SRC python
 def f_model_4(x, t, beta, a, efficacy, gamma, N, vacc_per_day, start_vacc, duration_vacc):
@@ -484,9 +873,15 @@ def f_model_4(x, t, beta, a, efficacy, gamma, N, vacc_per_day, start_vacc, durat
     dRv_dt = gamma*Iv + efficacy*V
     dC_dt = new_infections_n + new_infections_v
 
-    return [dSn_dt, dIn_dt, dRn_dt, dSv_dt, dIv_dt, dRv_dt, dC_dt]
+    return numpy.array([dSn_dt, dIn_dt, dRn_dt, dSv_dt, dIv_dt, dRv_dt, dC_dt])
+#+END_SRC
 
+As you notice with the =if= call above, one of the advantages of the
+python programming language is that it was designed to be a highly
+readable language. Let's start with a definition of =model_4= that
+just computes the results. This should be straight forward by now:
 
+#+BEGIN_SRC python
 def model_4(beta=0.02,
             a=10,
             efficacy=0.85,
@@ -498,33 +893,144 @@ def model_4(beta=0.02,
             N=10000.0,
             max_time=365.0):
 
-    ts = np.linspace(0, max_time, resolution)
+    ts = numpy.linspace(0, max_time, default_resolution)
     x0 = [N-initial_I, initial_I, 0, 0, 0, 0, 0]
-    xs = odeint(f_model_4, x0, ts, args=(beta, a, efficacy,
-                                         1/one_over_gamma, N,
-                                         vacc_per_day, start_vacc,
-                                         duration_vacc))
+    xs = odeint(f_model_4, x0, ts, (beta, a, efficacy, 1/one_over_gamma, N, vacc_per_day, start_vacc, duration_vacc))
+
+    return xs
+#+END_SRC
+
+** Slicing arrays
+
+In the case of models with too many classes, such as Model 4, it is
+also important to decide what part to visualize. For example we could
+aggregate individuals without paying attention to their vaccination
+status. First we need to learn how to select from the results the ones
+that we want, this was already hinted at in the definition of
+=model_3=.
+
+Remember that the result of =odeint= is matrix:
+
+#+BEGIN_SRC python
+results_model_4 = model_4()
+numpy.shape(results_model_4)
+#+END_SRC
+
+In this case, one with 1,000 rows (the values of $t$) and 7 columns
+(the classes). To select parts of that matrix (in NumPy words: to
+slice the array) we need to indicate which rows and which columns we
+want. The basic selection for the case of a matrix =M= is to use =M[n, m]=
+where you are indicating to select the n-th row and m-th
+column. By the way, it is very important to remember that python
+starts numbering with 0. So in order to select from our results the
+number of susceptible vaccinated individuals for the last time
+available (after one year), we would use:
+
+#+BEGIN_SRC python
+results_model_4[999, 3]
+#+END_SRC
+
+Another way to slice an array is to select ranges. You can do it using
+=[from_row:to_row, from_column:to_column]=, where you indicate with
+=from_row= the first row that you want to include (remember the first
+row is 0) and with =to_row= the first row that you do not want to
+include. In other words you go =from_row= =to_row= not including the
+last one. Similarly for columns.
+
+Perhaps it is much clearer with an example:
+
+#+BEGIN_SRC python
+results_model_4[0:500, 1:3]
+#+END_SRC
+
+This would select the first 500 values of $t$ (half a year because
+=max_time= is 365.0 and =default_resolution= is 1,000) for the
+non-vaccinated infectious individuals and the non-vaccinated recovered
+individuals.
+
+If you omit the first part of the selection in =n:m=, that is you
+write instead =:m=, 0 would be assumed as the value for =n=. If you
+omit the last one, that is if you write =n:= then the size of the
+array will be assumed as =m=. So the following code cell will give
+exactly the same as the previous code cell:
+
+#+BEGIN_SRC python
+results_model_4[:500, 1:3]
+#+END_SRC
+
+You can also omit both and you can also combine both ways to slice the
+array. For example to obtain the results for all times for the
+non-vaccinated susceptible individuals you would use:
+
+#+BEGIN_SRC python
+results_model_4[:, 0]
+#+END_SRC
+
+To obtain the results for half a year after the epidemic started for
+all classes you would use:
+
+#+BEGIN_SRC python
+results_model_4[499, :]
+#+END_SRC
+
+Using =results_model_4[499]= would also work. Notice that if we do
+that then we obtain vectors:
+
+#+BEGIN_SRC python
+numpy.shape(results_model_4[:, 0])
+#+END_SRC
+
+#+BEGIN_SRC python
+numpy.shape(results_model_4[499])
+#+END_SRC
+
+** Visualizing Model 4
+
+So now that we know how to select parts of the results we can
+visualize the results that we want. As stated before, one possibility
+is to aggregate non-vaccinated and vaccinated individuals:
+
+#+BEGIN_SRC python
+def model_4(beta=0.02,
+            a=10,
+            efficacy=0.85,
+            one_over_gamma=20.0,
+            start_vacc=30,
+            vacc_per_day=200,
+            duration_vacc=30,
+            initial_I=1.0,
+            N=10000.0,
+            max_time=365.0):
+
+    ts = numpy.linspace(0, max_time, default_resolution)
+    x0 = [N-initial_I, initial_I, 0, 0, 0, 0, 0]
+    xs = odeint(f_model_4, x0, ts, (beta, a, efficacy, 1/one_over_gamma, N, vacc_per_day, start_vacc, duration_vacc))
 
     total_S = xs[:, 0] + xs[:, 3]
     total_I = xs[:, 1] + xs[:, 4]
     cum_infected = xs[:, 6]
     vaccinated = xs[:, 3] + xs[:, 4] + xs[:, 5]
 
-    ys = np.vstack([total_S, total_I, cum_infected, vaccinated]).T
+    ys = numpy.vstack([total_S, total_I, cum_infected, vaccinated]).T
 
-    plot_results(ts, ys, ['Total susceptible',
-                          'Total infectious',
-                          'Cumulative infected',
-                          'Vaccinated'])
+    plot_results(ts, ys, ['Total susceptible', 'Total infectious', 'Cumulative infected', 'Vaccinated'])
 
     return xs
 #+END_SRC
 
-#+BEGIN_SRC python
-model_4()
-#+END_SRC
+The only new method used here is =numpy.vstack=, you should realize
+how it works just by knowing that it stands for vertically stacking,
+so it puts the vectors one of top of each other and we obtain a
+matrix. The only problem is that in this case it is a matrix with 4
+rows and 1,000 columns, to use it for =plot_results= (or for
+=pyplot.plot=) we want the results the other way around, with 1,000
+rows and 4 columns. We just need to transpose the matrix, and that is
+exactly what =.T= does.
 
-** Interacting with model 4
+If you want to visualize other aggregations, try to modify the code
+above and run it again.
+
+As usual to use =interact=, we just need to add the new parameters:
 
 #+BEGIN_SRC python
 default_sliders['efficacy'] = (0, 1, 0.01)
@@ -536,6 +1042,14 @@ default_sliders['duration_vacc'] = (1, 30*6, 1)
 #+BEGIN_SRC python
 interact(model_4, **default_sliders)
 #+END_SRC
+
+Obviously the vaccine efficacy should be a number between 0 and 1 as
+we set above. But should there be a limit to the other new variables
+that we introduced? What is happening when you set the vaccinations
+per day or the duration of vaccination too high? If you cannot
+identify what is happening substitute the line =plot_results(...= with
+=pyplot.plot(ts, total_S)= in the =model_4= definition above and rerun
+that code cell and the =interact=.
 
 # Local Variables:
 # org-src-preserve-indentation: t
