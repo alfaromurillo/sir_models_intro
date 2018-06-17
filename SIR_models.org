@@ -176,7 +176,7 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 \\ \frac{\mathrm{d}}{\mathrm{d}t} R(t) \end{bmatrix}
 = \begin{bmatrix} (1-p) \mu N(t)  + \omega R(t) - \big( \frac{a \beta
 I(t)}{N(t)} + \mu \big) S(t)
-\\ \frac{a \beta I(t)}{N(t)} S(t) - (\gamma + \mu) I(t) \\ p \mu N(t)
+\\ \frac{a \beta I(t)}{N(t)} S(t) - (\gamma + \mu) I(t) \\ p \mu N(t) +
 \gamma I(t) - (\mu + \omega) R(t)
 \end{bmatrix}$$
 
@@ -518,7 +518,7 @@ $$\frac{\mathrm{d}}{\mathrm{d}t}\mathbf{x}(t)
 \\ \frac{\mathrm{d}}{\mathrm{d}t} R(t) \end{bmatrix}
 = \begin{bmatrix} (1-p) \mu N(t)  + \omega R(t) - \big( \frac{a \beta
 I(t)}{N} -\mu \big) S(t)
-\\ \frac{a \beta I(t)}{N} S(t) - (\gamma + \mu) I(t) \\ p \mu N(t)
+\\ \frac{a \beta I(t)}{N} S(t) - (\gamma + \mu) I(t) \\ p \mu N(t) +
 \gamma I(t) - (\mu + \omega) R(t)
 \end{bmatrix}$$
 
