@@ -464,7 +464,7 @@ interact(model_1,
          beta=(0.01, 0.1, 0.001),
          a=(5, 15, 0.1),
          mu_times_365=(0.0, 1/20, 1/100),
-         omega=(0, 1, 0.01),
+         omega=(0, 1, 0.05),
          one_over_gamma=(2.0, 30.0, 0.1),
          p=(0, 1, 0.01),
          initial_S=(0, 1000),
@@ -491,7 +491,7 @@ called a dictionary:
 default_sliders = {'beta':(0.01, 0.2, 0.001),
                    'a':(5, 15, 0.25),
                    'mu_times_365':(0.0, 1/20, 1/100),
-                   'omega':(0, 1, 0.01),
+                   'omega':(0, 1, 0.05),
                    'one_over_gamma':(2.0, 30.0, 0.5),
                    'p':(0, 1, 0.01),
                    'initial_S':(0, 1000),
@@ -883,12 +883,12 @@ default_sliders['p1'] = default_sliders['p']
 default_sliders['p2'] = default_sliders['p']
 default_sliders['VE1'] = default_sliders['VE']
 default_sliders['VE2'] = default_sliders['VE']
-default_sliders['initial_S1'] = default_sliders['initial_S']
-default_sliders['initial_S2'] = default_sliders['initial_S']
-default_sliders['initial_I1'] = default_sliders['initial_I']
-default_sliders['initial_I2'] = default_sliders['initial_I']
-default_sliders['initial_R1'] = default_sliders['initial_R']
-default_sliders['initial_R2'] = default_sliders['initial_R']
+default_sliders['initial_S1'] = (0, 5000)
+default_sliders['initial_S2'] = (0, 5000)
+default_sliders['initial_I1'] = (0, 5000)
+default_sliders['initial_I2'] = (0, 5000)
+default_sliders['initial_R1'] = (0, 5000)
+default_sliders['initial_R2'] = (0, 5000)
 #+END_SRC
 
 #+BEGIN_SRC python
